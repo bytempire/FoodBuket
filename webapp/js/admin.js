@@ -17,7 +17,7 @@ const Admin = {
   ],
 
   render() {
-    const view = $('#view-admin');
+    const view = qs('#view-admin');
     view.innerHTML = `
       <div class="chips admin-tabs" id="adminTabs">
         ${Admin.TABS.map((tab) => `
@@ -33,7 +33,7 @@ const Admin = {
       chip.onclick = () => { Admin.tab = chip.dataset.tab; haptic('light'); Admin.render(); };
     });
     Admin.renderTab().catch((e) => {
-      $('#adminBody').innerHTML = `<div class="empty-text muted center mt16">${esc(e.message)}</div>`;
+      qs('#adminBody').innerHTML = `<div class="empty-text muted center mt16">${esc(e.message)}</div>`;
     });
   },
 
@@ -50,7 +50,7 @@ const Admin = {
 
   async tabDash() {
     const d = await API.get('/api/admin/overview');
-    $('#adminBody').innerHTML = `
+    qs('#adminBody').innerHTML = `
       <div class="stat-grid">
         <div class="stat-card">
           <div class="stat-label">${icMuted('banknote', 14)} ${esc(t('a_revenue'))}</div>
@@ -107,7 +107,7 @@ const Admin = {
   async tabProducts() {
     const { products } = await API.get('/api/admin/products');
     Admin._products = products;
-    $('#adminBody').innerHTML = `
+    qs('#adminBody').innerHTML = `
       ${products.map((p) => `
         <div class="admin-row ${p.active ? '' : 'inactive-row'}">
           <div class="ar-icon media">${p.image ? `<img src="${esc(p.image)}" alt="">` : ic(p.icon, 20)}</div>
@@ -122,7 +122,7 @@ const Admin = {
         </div>`).join('')}
       <button class="add-fab" id="addProduct">${icDark('plus', 26)}</button>
     `;
-    $('#addProduct').onclick = () => Admin.productEditor(null);
+    qs('#addProduct').onclick = () => Admin.productEditor(null);
     document.querySelectorAll('[data-edit]').forEach((b) => {
       b.onclick = () => Admin.productEditor(Admin._products.find((p) => p.id === Number(b.dataset.edit)));
     });
@@ -189,17 +189,17 @@ const Admin = {
     `);
 
     const showClear = (on) => {
-      const b = $('#fPhotoClear');
+      const b = qs('#fPhotoClear');
       if (b) b.style.display = on ? '' : 'none';
     };
     const setPreview = (src) => {
-      $('#photoPrev').innerHTML = src
+      qs('#photoPrev').innerHTML = src
         ? `<img src="${esc(src)}" alt="">`
         : `<div class="photo-empty">${icMuted('image', 28)}<span>${esc(t('a_no_photo'))}</span></div>`;
       showClear(!!src);
     };
 
-    $('#fPhoto').onchange = async (e) => {
+    qs('#fPhoto').onchange = async (e) => {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
       if (file.size > 5 * 1024 * 1024) {
@@ -220,9 +220,9 @@ const Admin = {
       reader.readAsDataURL(file);
     };
 
-    $('#fPhotoClear').onclick = async () => {
+    qs('#fPhotoClear').onclick = async () => {
       pendingImage = null;
-      $('#fPhoto').value = '';
+      qs('#fPhoto').value = '';
       if (!isNew && p.image) {
         try {
           await API.del('/api/admin/products/' + p.id + '/image');
@@ -236,19 +236,19 @@ const Admin = {
       setPreview('');
     };
 
-    $('#fSave').onclick = async () => {
+    qs('#fSave').onclick = async () => {
       const body = {
-        name: $('#fName').value,
-        subtitle: $('#fSub').value,
-        description: $('#fDesc').value,
-        price: $('#fPrice').value,
-        old_price: $('#fOld').value || null,
-        category_id: $('#fCat').value || null,
-        badge: $('#fBadge').value,
+        name: qs('#fName').value,
+        subtitle: qs('#fSub').value,
+        description: qs('#fDesc').value,
+        price: qs('#fPrice').value,
+        old_price: qs('#fOld').value || null,
+        category_id: qs('#fCat').value || null,
+        badge: qs('#fBadge').value,
         icon: 'layers',
-        stock_qty: $('#fStock').value,
-        sort: $('#fSort').value,
-        active: $('#fActive').checked,
+        stock_qty: qs('#fStock').value,
+        sort: qs('#fSort').value,
+        active: qs('#fActive').checked,
       };
       try {
         const saved = isNew
@@ -273,7 +273,7 @@ const Admin = {
 
   async tabCats() {
     await refreshShop();
-    $('#adminBody').innerHTML = `
+    qs('#adminBody').innerHTML = `
       ${state.categories.map((c) => `
         <div class="admin-row">
           <div class="ar-icon">${ic(c.icon, 20)}</div>
@@ -288,7 +288,7 @@ const Admin = {
         </div>`).join('')}
       <button class="add-fab" id="addCat">${icDark('plus', 26)}</button>
     `;
-    $('#addCat').onclick = () => Admin.catEditor(null);
+    qs('#addCat').onclick = () => Admin.catEditor(null);
     document.querySelectorAll('[data-edit]').forEach((b) => {
       b.onclick = () => Admin.catEditor(state.categories.find((c) => c.id === Number(b.dataset.edit)));
     });
@@ -318,9 +318,9 @@ const Admin = {
       </div>
       <button class="btn" id="cSave">${icDark('save', 17)} ${esc(t('a_save'))}</button>
     `);
-    $('#cIcon').oninput = () => { $('#cIconPrev').innerHTML = ic($('#cIcon').value || 'folder', 20); };
-    $('#cSave').onclick = async () => {
-      const body = { name: $('#cName').value, icon: $('#cIcon').value, sort: $('#cSort').value };
+    qs('#cIcon').oninput = () => { qs('#cIconPrev').innerHTML = ic(qs('#cIcon').value || 'folder', 20); };
+    qs('#cSave').onclick = async () => {
+      const body = { name: qs('#cName').value, icon: qs('#cIcon').value, sort: qs('#cSort').value };
       try {
         if (isNew) await API.post('/api/admin/categories', body);
         else await API.put('/api/admin/categories/' + c.id, body);
@@ -337,7 +337,7 @@ const Admin = {
   async tabOrders() {
     const { orders } = await API.get('/api/admin/orders');
     Admin._orders = orders;
-    $('#adminBody').innerHTML = orders.length ? orders.map((o) => `
+    qs('#adminBody').innerHTML = orders.length ? orders.map((o) => `
       <div class="admin-row" data-order="${o.id}" style="cursor:pointer">
         <div class="ar-icon">${ic(o.status === 'shipped' ? 'truck' : o.status === 'paid' ? 'badge-check' : o.status === 'pending' ? 'clock' : 'badge-x', 19)}</div>
         <div class="ar-main">
@@ -387,7 +387,7 @@ const Admin = {
         <button class="btn" id="ordShip">${icDark('truck', 16)} ${esc(o.status === 'shipped' ? t('a_update_track') : t('a_mark_shipped'))}</button>` : ''}
       ${o.status === 'pending' ? `<button class="btn mt8" id="ordCheck">${icDark('refresh-cw', 16)} ${esc(t('a_check_pay'))}</button>` : ''}
     `);
-    const check = $('#ordCheck');
+    const check = qs('#ordCheck');
     if (check) {
       check.onclick = async () => {
         check.disabled = true;
@@ -399,12 +399,12 @@ const Admin = {
         } catch (e) { toast(e.message, true); check.disabled = false; }
       };
     }
-    const ship = $('#ordShip');
+    const ship = qs('#ordShip');
     if (ship) {
       ship.onclick = async () => {
         ship.disabled = true;
         try {
-          await API.post(`/api/admin/orders/${o.id}/ship`, { tracking: $('#ordTrack').value });
+          await API.post(`/api/admin/orders/${o.id}/ship`, { tracking: qs('#ordTrack').value });
           haptic('success');
           toast(t('a_shipped_ok'));
           closeSheet();
@@ -418,7 +418,7 @@ const Admin = {
 
   async tabPromos() {
     const { promos } = await API.get('/api/admin/promos');
-    $('#adminBody').innerHTML = `
+    qs('#adminBody').innerHTML = `
       ${promos.length ? promos.map((p) => `
         <div class="admin-row ${p.active ? '' : 'inactive-row'}">
           <div class="ar-icon">${ic('ticket-percent', 19)}</div>
@@ -435,7 +435,7 @@ const Admin = {
            <div class="empty-text">${esc(t('a_no_promos'))}</div></div>`}
       <button class="add-fab" id="addPromo">${icDark('plus', 26)}</button>
     `;
-    $('#addPromo').onclick = () => {
+    qs('#addPromo').onclick = () => {
       openSheet(`
         <div class="sheet-title mb16">${esc(t('a_promo_new'))}</div>
         <div class="field"><label>${esc(t('a_code'))}</label><input id="prCode" placeholder="SALE20" style="text-transform:uppercase;font-family:var(--font-mono)"></div>
@@ -445,10 +445,10 @@ const Admin = {
         </div>
         <button class="btn" id="prSave">${icDark('save', 17)} ${esc(t('a_create'))}</button>
       `);
-      $('#prSave').onclick = async () => {
+      qs('#prSave').onclick = async () => {
         try {
           await API.post('/api/admin/promos', {
-            code: $('#prCode').value, percent: $('#prPercent').value, max_uses: $('#prMax').value,
+            code: qs('#prCode').value, percent: qs('#prPercent').value, max_uses: qs('#prMax').value,
           });
           toast(t('a_promo_created'));
           closeSheet();
@@ -474,7 +474,7 @@ const Admin = {
 
   async tabUsers() {
     const { users } = await API.get('/api/admin/users');
-    $('#adminBody').innerHTML = users.length ? users.map((u) => `
+    qs('#adminBody').innerHTML = users.length ? users.map((u) => `
       <div class="admin-row ${u.is_banned ? 'inactive-row' : ''}">
         <div class="ar-icon">${ic(u.is_banned ? 'user-x' : 'user-round', 19)}</div>
         <div class="ar-main">
@@ -504,7 +504,7 @@ const Admin = {
   /* ---------- рассылка ---------- */
 
   async tabCast() {
-    $('#adminBody').innerHTML = `
+    qs('#adminBody').innerHTML = `
       <div class="section-title">${esc(t('a_broadcast'))}</div>
       <div class="field">
         <label>${esc(t('a_broadcast'))}</label>
@@ -513,15 +513,15 @@ const Admin = {
       </div>
       <button class="btn" id="castSend">${icDark('send', 17)} ${esc(t('a_send'))}</button>
     `;
-    $('#castSend').onclick = () => {
-      const text = $('#castText').value.trim();
+    qs('#castSend').onclick = () => {
+      const text = qs('#castText').value.trim();
       if (!text) { toast(t('a_enter_text'), true); return; }
       confirmDialog(t('a_confirm_cast'), async () => {
         try {
           const r = await API.post('/api/admin/broadcast', { text });
           haptic('success');
           toast(t('a_cast_started', { n: r.recipients }));
-          $('#castText').value = '';
+          qs('#castText').value = '';
         } catch (e) { toast(e.message, true); }
       });
     };
@@ -531,7 +531,7 @@ const Admin = {
 
   async tabSettings() {
     const s = await API.get('/api/admin/settings');
-    $('#adminBody').innerHTML = `
+    qs('#adminBody').innerHTML = `
       <div class="section-title">${esc(t('a_shop_settings'))}</div>
       <div class="field"><label>${esc(t('a_name'))}</label><input id="sName" value="${esc(s.shop_name)}"></div>
       <div class="field"><label>${esc(t('a_tagline'))}</label><input id="sTag" value="${esc(s.tagline)}"></div>
@@ -564,12 +564,12 @@ const Admin = {
         </div>
       </div>
     `;
-    $('#sSave').onclick = async () => {
+    qs('#sSave').onclick = async () => {
       try {
         state.settings = await API.put('/api/admin/settings', {
-          shop_name: $('#sName').value, tagline: $('#sTag').value,
-          currency_symbol: $('#sCur').value, support: $('#sSup').value,
-          webapp_url: $('#sWeb').value, shipping_note: $('#sShip').value,
+          shop_name: qs('#sName').value, tagline: qs('#sTag').value,
+          currency_symbol: qs('#sCur').value, support: qs('#sSup').value,
+          webapp_url: qs('#sWeb').value, shipping_note: qs('#sShip').value,
         });
         applyBranding();
         haptic('success');

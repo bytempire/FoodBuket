@@ -22,7 +22,7 @@ const state = {
 
 /* ---------- утилиты ---------- */
 
-const $ = (sel) => document.querySelector(sel);
+const qs = (sel) => document.querySelector(sel);
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, (c) => ({
@@ -60,7 +60,7 @@ function toast(text, dark = false) {
   const el = document.createElement('div');
   el.className = 'toast' + (dark ? ' dark' : '');
   el.innerHTML = `${dark ? ic('info', 16) : icDark('check', 16)}<span>${esc(text)}</span>`;
-  $('#toasts').appendChild(el);
+  qs('#toasts').appendChild(el);
   setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 250); }, 2400);
 }
 
@@ -82,16 +82,16 @@ let sheetCloseCb = null;
 
 function openSheet(html, onClose) {
   sheetCloseCb = onClose || null;
-  $('#sheet-content').innerHTML = html;
-  $('#sheet').classList.remove('hidden');
-  $('#sheet-backdrop').classList.remove('hidden');
+  qs('#sheet-content').innerHTML = html;
+  qs('#sheet').classList.remove('hidden');
+  qs('#sheet-backdrop').classList.remove('hidden');
   if (IN_TG) { try { tg.BackButton.show(); } catch (e) {} }
   haptic('light');
 }
 
 function closeSheet() {
-  $('#sheet').classList.add('hidden');
-  $('#sheet-backdrop').classList.add('hidden');
+  qs('#sheet').classList.add('hidden');
+  qs('#sheet-backdrop').classList.add('hidden');
   if (IN_TG) { try { tg.BackButton.hide(); } catch (e) {} }
   if (sheetCloseCb) { const cb = sheetCloseCb; sheetCloseCb = null; cb(); }
 }
@@ -106,8 +106,8 @@ function confirmDialog(text, onYes) {
         <button class="btn" id="cfYes">${esc(t('yes'))}</button>
       </div>
     </div>`);
-  $('#cfNo').onclick = closeSheet;
-  $('#cfYes').onclick = () => { closeSheet(); onYes(); };
+  qs('#cfNo').onclick = closeSheet;
+  qs('#cfYes').onclick = () => { closeSheet(); onYes(); };
 }
 
 /* ---------- корзина (localStorage) ---------- */
@@ -148,7 +148,7 @@ const NAV = [
 ];
 
 function renderNav() {
-  $('#bottomnav').innerHTML = NAV
+  qs('#bottomnav').innerHTML = NAV
     .filter((n) => !n.adminOnly || state.isAdmin)
     .map((n) => `
       <button class="nav-item ${state.view === n.id ? 'active' : ''}" data-view="${n.id}">
@@ -168,9 +168,9 @@ function switchView(view) {
   state.view = view;
   haptic('light');
   document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
-  $('#view-' + view).classList.add('active');
-  $('#marquee').style.display = view === 'home' ? '' : 'none';
-  $('#searchBar').classList.toggle('hidden', view !== 'home' || !state.search);
+  qs('#view-' + view).classList.add('active');
+  qs('#marquee').style.display = view === 'home' ? '' : 'none';
+  qs('#searchBar').classList.toggle('hidden', view !== 'home' || !state.search);
   renderNav();
   if (view === 'home') renderHome();
   if (view === 'cart') renderCart();
@@ -190,9 +190,9 @@ function refreshCurrentView() {
 }
 
 function applyChromeI18n() {
-  const searchBtn = $('#searchBtn');
+  const searchBtn = qs('#searchBtn');
   if (searchBtn) searchBtn.setAttribute('aria-label', t('search_aria'));
-  const searchInput = $('#searchInput');
+  const searchInput = qs('#searchInput');
   if (searchInput) searchInput.placeholder = t('search_ph');
   const lang = I18N.lang();
   document.querySelectorAll('#langSwitch [data-lang]').forEach((btn) => {
@@ -201,7 +201,7 @@ function applyChromeI18n() {
 }
 
 function initLangSwitch() {
-  const root = $('#langSwitch');
+  const root = qs('#langSwitch');
   if (!root || root.dataset.bound === '1') return;
   root.dataset.bound = '1';
   root.querySelectorAll('[data-lang]').forEach((btn) => {
@@ -251,7 +251,7 @@ function productCard(p) {
 function renderHome() {
   const cats = state.categories.filter((c) => c.count > 0);
   const list = visibleProducts();
-  $('#view-home').innerHTML = `
+  qs('#view-home').innerHTML = `
     <div class="chips" id="chips">
       <button class="chip ${!state.activeCat ? 'active' : ''}" data-cat="0">
         ${ic('layout-grid', 15, !state.activeCat ? '#ffffff' : '#1A3A2F')} ${esc(t('all'))}
@@ -326,14 +326,14 @@ function openProduct(id) {
 
   if (!out) {
     const refresh = () => {
-      const el = $('#qVal'); if (el) el.textContent = qty;
-      const totalEl = $('#pdTotal'); if (totalEl) totalEl.textContent = money(p.price * qty);
+      const el = qs('#qVal'); if (el) el.textContent = qty;
+      const totalEl = qs('#pdTotal'); if (totalEl) totalEl.textContent = money(p.price * qty);
     };
-    const minus = $('#qMinus'), plus = $('#qPlus');
+    const minus = qs('#qMinus'), plus = qs('#qPlus');
     if (minus) minus.onclick = () => { if (qty > 1) { qty--; haptic('light'); refresh(); } };
     if (plus) plus.onclick = () => { if (qty < maxQty) { qty++; haptic('light'); refresh(); } };
-    $('#pdCart').onclick = () => { addToCart(p.id, qty); closeSheet(); };
-    $('#pdBuy').onclick = () => buyNow(p.id, qty);
+    qs('#pdCart').onclick = () => { addToCart(p.id, qty); closeSheet(); };
+    qs('#pdBuy').onclick = () => buyNow(p.id, qty);
   }
 }
 
@@ -374,14 +374,14 @@ function openShippingSheet(items, promoCode) {
     <div class="field"><label>${esc(t('ship_comment'))}</label><input id="shComment" value="${esc(prev.comment || '')}" placeholder="${esc(t('ship_comment_ph'))}"></div>
     <button class="btn" id="shNext">${icDark('wallet', 17)} ${esc(t('to_payment'))}</button>
   `);
-  $('#shNext').onclick = () => {
+  qs('#shNext').onclick = () => {
     const shipping = {
-      name: $('#shName').value.trim(),
-      phone: $('#shPhone').value.trim(),
-      city: $('#shCity').value.trim(),
-      postal: $('#shPostal').value.trim(),
-      address: $('#shAddr').value.trim(),
-      comment: $('#shComment').value.trim(),
+      name: qs('#shName').value.trim(),
+      phone: qs('#shPhone').value.trim(),
+      city: qs('#shCity').value.trim(),
+      postal: qs('#shPostal').value.trim(),
+      address: qs('#shAddr').value.trim(),
+      comment: qs('#shComment').value.trim(),
     };
     if (!shipping.name || !shipping.phone || !shipping.city || !shipping.address) {
       toast(t('fill_required'), true);
@@ -434,7 +434,7 @@ function showPaymentSheet(order) {
       <button class="btn btn-ghost btn-sm" id="payLater">${esc(t('pay_later'))}</button>
     </div>`,
     () => stopPolling());
-  $('#payOpen').onclick = async () => {
+  qs('#payOpen').onclick = async () => {
     haptic('medium');
     if (demo) {
       try {
@@ -445,7 +445,7 @@ function showPaymentSheet(order) {
     }
     openPayUrl(order.pay_url);
   };
-  $('#payLater').onclick = () => { closeSheet(); switchView('profile'); };
+  qs('#payLater').onclick = () => { closeSheet(); switchView('profile'); };
   if (!demo) {
     openPayUrl(order.pay_url);
     startPolling(order.id);
@@ -526,8 +526,8 @@ function afterPaid(order) {
     <div id="successDelivery">${orderStatusBlock(order)}${shippingBlock(order)}</div>
     <button class="btn mt16" id="successOk">${icDark('check', 17)} ${esc(t('great'))}</button>
   `);
-  bindCopyButtons($('#successDelivery'));
-  $('#successOk').onclick = () => { closeSheet(); switchView('profile'); };
+  bindCopyButtons(qs('#successDelivery'));
+  qs('#successOk').onclick = () => { closeSheet(); switchView('profile'); };
 }
 
 function bindCopyButtons(root) {
@@ -539,7 +539,7 @@ function bindCopyButtons(root) {
 /* ---------- корзина ---------- */
 
 function renderCart() {
-  const view = $('#view-cart');
+  const view = qs('#view-cart');
   if (!state.cart.length) {
     view.innerHTML = `
       <div class="empty" style="padding-top:90px">
@@ -548,7 +548,7 @@ function renderCart() {
         <div class="empty-text">${esc(t('cart_empty_hint'))}</div>
         <button class="btn btn-sm" id="goShop" style="width:auto">${icDark('store', 15)} ${esc(t('to_catalog'))}</button>
       </div>`;
-    $('#goShop').onclick = () => switchView('home');
+    qs('#goShop').onclick = () => switchView('home');
     return;
   }
 
@@ -615,13 +615,13 @@ function renderCart() {
     });
   });
 
-  $('#promoBtn').onclick = async () => {
+  qs('#promoBtn').onclick = async () => {
     if (state.promo) {
       state.promo = null;
       renderCart();
       return;
     }
-    const code = $('#promoInput').value.trim();
+    const code = qs('#promoInput').value.trim();
     if (!code) { toast(t('enter_promo'), true); return; }
     try {
       state.promo = await API.post('/api/promo/check', { code });
@@ -634,7 +634,7 @@ function renderCart() {
     }
   };
 
-  $('#checkoutBtn').onclick = () => {
+  qs('#checkoutBtn').onclick = () => {
     openShippingSheet(state.cart.map((i) => ({ id: i.id, qty: i.qty })),
                       state.promo ? state.promo.code : null);
   };
@@ -653,7 +653,7 @@ function statusBadge(s) {
 }
 
 async function renderProfile() {
-  const view = $('#view-profile');
+  const view = qs('#view-profile');
   const u = state.user || {};
   const initial = (u.first_name || 'U').slice(0, 1).toUpperCase();
   view.innerHTML = `
@@ -671,7 +671,7 @@ async function renderProfile() {
     <button class="btn btn-ghost" id="supportBtn">${ic('message-circle', 17)} ${esc(t('write_support'))}</button>
   `;
 
-  $('#supportBtn').onclick = () => {
+  qs('#supportBtn').onclick = () => {
     const support = (state.settings.support || '').replace('@', '');
     if (support) openPayUrl('https://t.me/' + support);
   };
@@ -681,12 +681,12 @@ async function renderProfile() {
     orders = (await API.get('/api/my/orders')).orders;
     state.myOrders = orders;
   } catch (e) {
-    $('#ordersList').innerHTML = `<div class="empty-text muted center">${esc(e.message)}</div>`;
+    qs('#ordersList').innerHTML = `<div class="empty-text muted center">${esc(e.message)}</div>`;
     return;
   }
 
   if (!orders.length) {
-    $('#ordersList').innerHTML = `
+    qs('#ordersList').innerHTML = `
       <div class="empty" style="padding:28px 20px">
         <div class="empty-icon">${icMuted('package-open', 32)}</div>
         <div class="empty-text">${esc(t('no_orders'))}</div>
@@ -694,7 +694,7 @@ async function renderProfile() {
     return;
   }
 
-  $('#ordersList').innerHTML = orders.map((o) => `
+  qs('#ordersList').innerHTML = orders.map((o) => `
     <div class="order-card" data-id="${o.id}">
       <div class="oc-head">
         <div>
@@ -714,7 +714,7 @@ async function renderProfile() {
       </div>
     </div>`).join('');
 
-  bindCopyButtons($('#ordersList'));
+  bindCopyButtons(qs('#ordersList'));
   document.querySelectorAll('[data-pay]').forEach((btn) => {
     btn.onclick = () => openPayUrl(btn.dataset.pay);
   });
@@ -733,24 +733,24 @@ async function renderProfile() {
 /* ---------- поиск ---------- */
 
 function initSearch() {
-  $('#searchBtn').innerHTML = ic('search', 19);
-  $('#searchIcon').innerHTML = icMuted('search', 17);
-  $('#searchBtn').onclick = () => {
+  qs('#searchBtn').innerHTML = ic('search', 19);
+  qs('#searchIcon').innerHTML = icMuted('search', 17);
+  qs('#searchBtn').onclick = () => {
     if (state.view !== 'home') switchView('home');
-    const bar = $('#searchBar');
+    const bar = qs('#searchBar');
     bar.classList.toggle('hidden');
-    if (!bar.classList.contains('hidden')) $('#searchInput').focus();
-    else { state.search = ''; $('#searchInput').value = ''; renderHome(); }
+    if (!bar.classList.contains('hidden')) qs('#searchInput').focus();
+    else { state.search = ''; qs('#searchInput').value = ''; renderHome(); }
   };
-  $('#searchInput').oninput = (e) => {
+  qs('#searchInput').oninput = (e) => {
     state.search = e.target.value.trim();
-    $('#searchClear').classList.toggle('hidden', !state.search);
+    qs('#searchClear').classList.toggle('hidden', !state.search);
     renderHome();
   };
-  $('#searchClear').onclick = () => {
+  qs('#searchClear').onclick = () => {
     state.search = '';
-    $('#searchInput').value = '';
-    $('#searchClear').classList.add('hidden');
+    qs('#searchInput').value = '';
+    qs('#searchClear').classList.add('hidden');
     renderHome();
   };
 }
@@ -773,22 +773,22 @@ function applyBranding() {
   if (I18N.lang() === 'en' && (tagline.includes('виниловые') || tagline === ruDefault || !tagline)) {
     tagline = t('default_tagline');
   }
-  $('#brandName').textContent = s.shop_name || 'Food Букет';
-  $('#brandTag').textContent = tagline;
-  $('#brandMark').innerHTML = icDark('flower-2', 20);
+  qs('#brandName').textContent = s.shop_name || 'Food Букет';
+  qs('#brandTag').textContent = tagline;
+  qs('#brandMark').innerHTML = icDark('flower-2', 20);
   const words = `${s.shop_name || 'Food Букет'} ✦ ${tagline} ✦ ${t('marquee_extra')} ✦ `;
-  $('#marqueeTrack').textContent = words.repeat(4);
+  qs('#marqueeTrack').textContent = words.repeat(4);
   document.title = s.shop_name || 'Food Букет';
 }
 
 /* ---------- запуск ---------- */
 
 function fatal(icon, title, text) {
-  $('#splash').classList.add('done');
-  $('#fatal').classList.remove('hidden');
-  $('#fatalIcon').innerHTML = `<div class="empty-icon">${icMuted(icon, 38)}</div>`;
-  $('#fatalTitle').textContent = title;
-  $('#fatalText').textContent = text;
+  qs('#splash').classList.add('done');
+  qs('#fatal').classList.remove('hidden');
+  qs('#fatalIcon').innerHTML = `<div class="empty-icon">${icMuted(icon, 38)}</div>`;
+  qs('#fatalTitle').textContent = title;
+  qs('#fatalText').textContent = text;
 }
 
 async function boot() {
@@ -802,7 +802,7 @@ async function boot() {
       tg.BackButton.onClick(closeSheet);
     } catch (e) { /* старые клиенты */ }
   }
-  $('#sheet-backdrop').onclick = closeSheet;
+  qs('#sheet-backdrop').onclick = closeSheet;
   initLangSwitch();
   applyChromeI18n();
   initSearch();
@@ -832,10 +832,10 @@ async function boot() {
   renderNav();
   renderHome();
   if (API.isDemo) {
-    const b = $('#demoBanner');
+    const b = qs('#demoBanner');
     if (b) b.classList.remove('hidden');
   }
-  setTimeout(() => $('#splash').classList.add('done'), 350);
+  setTimeout(() => qs('#splash').classList.add('done'), 350);
 }
 
 boot();

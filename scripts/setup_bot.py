@@ -76,13 +76,13 @@ def main():
         print('URL мини-аппа сохранён в настройках магазина.')
 
     print('Кнопка меню…', tg('setChatMenuButton', {
-        'menu_button': {'type': 'web_app', 'text': 'Магазин',
+        'menu_button': {'type': 'web_app', 'text': 'Food Букет',
                         'web_app': {'url': url}}}))
     print('Описание…', tg('setMyDescription', {
-        'description': 'Магазин виниловых наклеек. Жми «Магазин» — каталог и заказ в мини-аппе. Оплата криптой через @CryptoBot, доставка почтой.'}))
+        'description': 'Food Букет — свежие цветы с доставкой. Жми «Food Букет» — каталог и заказ в мини-аппе.'}))
     print('Короткое описание…', tg('setMyShortDescription', {
-        'short_description': 'Наклейки · оплата криптой · доставка с треком'}))
-    print('\nГотово! Открой бота и нажми кнопку «Магазин».')
+        'short_description': 'Цветы · букеты · доставка курьером'}))
+    print('\nГотово! Открой бота и нажми кнопку «Food Букет».')
     print('Совет: в @BotFather можно ещё включить Main Mini App (/mybots → Bot Settings → Main Mini App) с тем же URL.')
 
 

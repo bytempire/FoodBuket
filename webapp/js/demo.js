@@ -120,7 +120,7 @@ const DemoStore = (() => {
       const raw = localStorage.getItem(KEY);
       if (raw) return JSON.parse(raw);
     } catch (e) { /* ignore */ }
-    const data = structuredClone(SEED);
+    const data = JSON.parse(JSON.stringify(SEED));
     save(data);
     return data;
   }
