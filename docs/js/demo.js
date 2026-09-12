@@ -3,7 +3,7 @@
    ============================================================ */
 
 const DemoStore = (() => {
-  const KEY = 'foodbuket_demo_v1';
+  const KEY = 'foodbuket_demo_v2';
 
   const SEED = {
     settings: {
@@ -105,14 +105,116 @@ const DemoStore = (() => {
       },
     ],
     promos: [
-      { id: 1, code: 'FLOWERS10', percent: 10, active: 1, used: 3, max_uses: 0 },
-      { id: 2, code: 'START10', percent: 10, active: 1, used: 0, max_uses: 0 },
+      { id: 1, code: 'FLOWERS10', percent: 10, active: 1, used: 14, max_uses: 0 },
+      { id: 2, code: 'START10', percent: 10, active: 1, used: 5, max_uses: 0 },
     ],
-    orders: [],
     users: [
-      { id: 1, first_name: 'Демо', username: 'demo', photo_url: '', banned: 0, created_at: Date.now() },
+      { id: 1, first_name: 'Демо', username: 'demo', photo_url: '', banned: 0, created_at: Date.now() - 86400000 * 20 },
+      { id: 2, first_name: 'Анна', username: 'anna_flowers', photo_url: '', banned: 0, created_at: Date.now() - 86400000 * 12 },
+      { id: 3, first_name: 'Игорь', username: 'igor_k', photo_url: '', banned: 0, created_at: Date.now() - 86400000 * 9 },
+      { id: 4, first_name: 'Мария', username: 'masha_rz', photo_url: '', banned: 0, created_at: Date.now() - 86400000 * 7 },
+      { id: 5, first_name: 'Сергей', username: 'serg_pro', photo_url: '', banned: 0, created_at: Date.now() - 86400000 * 5 },
+      { id: 6, first_name: 'Ольга', username: 'olya_b', photo_url: '', banned: 0, created_at: Date.now() - 86400000 * 3 },
+      { id: 7, first_name: 'Дмитрий', username: 'dima88', photo_url: '', banned: 1, created_at: Date.now() - 86400000 * 15 },
+      { id: 8, first_name: 'Елена', username: 'lena_home', photo_url: '', banned: 0, created_at: Date.now() - 86400000 * 2 },
     ],
-    nextIds: { product: 11, category: 6, promo: 3, order: 1001 },
+    orders: (() => {
+      const hour = 3600000;
+      const day = 86400000;
+      const now = Date.now();
+      const ship = (name, phone, city, address) => ({
+        name, phone, city, postal: '390000', address, comment: '',
+      });
+      return [
+        {
+          id: 1012, status: 'paid', user_id: 8, username: 'lena_home',
+          items: [{ id: 1, name: 'Нежность', qty: 1, price: 4900 }],
+          total: 4900, discount: 0, promo: null,
+          shipping: ship('Елена Новикова', '+7 910 111-22-33', 'Рязань', 'ул. Ленина, 12'),
+          pay_url: 'demo://pay', tracking: '', delivery: { status_key: 'paid_packing' },
+          created_at: now - hour * 2,
+        },
+        {
+          id: 1011, status: 'paid', user_id: 6, username: 'olya_b',
+          items: [
+            { id: 4, name: 'Коробка «Романтика»', qty: 1, price: 7900 },
+            { id: 8, name: 'Набор «С заботой»', qty: 1, price: 5900 },
+          ],
+          total: 12420, discount: 1380, promo: 'FLOWERS10',
+          shipping: ship('Ольга Белова', '+7 920 444-55-66', 'Рязань', 'пр. Первомайский, 45'),
+          pay_url: 'demo://pay', tracking: '', delivery: { status_key: 'paid_packing' },
+          created_at: now - hour * 5,
+        },
+        {
+          id: 1010, status: 'shipped', user_id: 4, username: 'masha_rz',
+          items: [{ id: 2, name: 'Классика 25', qty: 1, price: 6900 }],
+          total: 6900, discount: 0, promo: null,
+          shipping: ship('Мария Соколова', '+7 915 222-33-44', 'Рязань', 'ул. Свободы, 8'),
+          pay_url: 'demo://pay', tracking: 'FB1010RZ', delivery: null,
+          created_at: now - day,
+        },
+        {
+          id: 1009, status: 'shipped', user_id: 5, username: 'serg_pro',
+          items: [{ id: 6, name: 'Тюльпаны весны', qty: 2, price: 4200 }],
+          total: 7560, discount: 840, promo: 'FLOWERS10',
+          shipping: ship('Сергей Прохоров', '+7 953 777-88-99', 'Рязань', 'ул. Гагарина, 3'),
+          pay_url: 'demo://pay', tracking: 'FB1009RZ', delivery: null,
+          created_at: now - day - hour * 4,
+        },
+        {
+          id: 1008, status: 'pending', user_id: 3, username: 'igor_k',
+          items: [{ id: 5, name: 'Пудровые розы', qty: 1, price: 5400 }],
+          total: 5400, discount: 0, promo: null,
+          shipping: ship('Игорь Кузнецов', '+7 900 123-45-67', 'Рязань', 'ул. Новоселов, 21'),
+          pay_url: 'demo://pay', tracking: '', delivery: null,
+          created_at: now - day * 2,
+        },
+        {
+          id: 1007, status: 'shipped', user_id: 2, username: 'anna_flowers',
+          items: [
+            { id: 3, name: 'Солнечный день', qty: 1, price: 3900 },
+            { id: 9, name: 'Лавандовый сад', qty: 1, price: 3200 },
+          ],
+          total: 7100, discount: 0, promo: null,
+          shipping: ship('Анна Цветкова', '+7 980 555-01-02', 'Рязань', 'ул. Почтовая, 17'),
+          pay_url: 'demo://pay', tracking: 'FB1007RZ', delivery: null,
+          created_at: now - day * 3,
+        },
+        {
+          id: 1006, status: 'shipped', user_id: 4, username: 'masha_rz',
+          items: [{ id: 8, name: 'Набор «С заботой»', qty: 1, price: 5900 }],
+          total: 5310, discount: 590, promo: 'START10',
+          shipping: ship('Мария Соколова', '+7 915 222-33-44', 'Рязань', 'ул. Свободы, 8'),
+          pay_url: 'demo://pay', tracking: 'FB1006RZ', delivery: null,
+          created_at: now - day * 4,
+        },
+        {
+          id: 1005, status: 'expired', user_id: 7, username: 'dima88',
+          items: [{ id: 7, name: 'Монстера в кашпо', qty: 1, price: 3500 }],
+          total: 3500, discount: 0, promo: null,
+          shipping: ship('Дмитрий Орлов', '+7 999 000-11-22', 'Рязань', 'ул. Касимовское ш., 5'),
+          pay_url: 'demo://pay', tracking: '', delivery: null,
+          created_at: now - day * 6,
+        },
+        {
+          id: 1004, status: 'shipped', user_id: 2, username: 'anna_flowers',
+          items: [{ id: 1, name: 'Нежность', qty: 1, price: 4900 }],
+          total: 4900, discount: 0, promo: null,
+          shipping: ship('Анна Цветкова', '+7 980 555-01-02', 'Рязань', 'ул. Почтовая, 17'),
+          pay_url: 'demo://pay', tracking: 'FB1004RZ', delivery: null,
+          created_at: now - day * 8,
+        },
+        {
+          id: 1003, status: 'shipped', user_id: 5, username: 'serg_pro',
+          items: [{ id: 2, name: 'Классика 25', qty: 1, price: 6900 }],
+          total: 6900, discount: 0, promo: null,
+          shipping: ship('Сергей Прохоров', '+7 953 777-88-99', 'Рязань', 'ул. Гагарина, 3'),
+          pay_url: 'demo://pay', tracking: 'FB1003RZ', delivery: null,
+          created_at: now - day * 10,
+        },
+      ];
+    })(),
+    nextIds: { product: 11, category: 6, promo: 3, order: 1013 },
   };
 
   function load() {
@@ -244,26 +346,51 @@ const DemoAPI = {
     if (m === 'GET' && path === '/api/admin/overview') {
       const paid = db.orders.filter((o) => o.status === 'paid' || o.status === 'shipped');
       const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
-      const revenue = paid.reduce((s, o) => s + o.total, 0);
+      const revenueTotal = paid.reduce((s, o) => s + o.total, 0);
       const revenueToday = paid.filter((o) => o.created_at >= todayStart.getTime())
         .reduce((s, o) => s + o.total, 0);
-      const toShip = db.orders.filter((o) => o.status === 'paid').length;
-      const shipped = db.orders.filter((o) => o.status === 'shipped').length;
-      const stock = db.products.reduce((s, p) => s + (p.stock_left || 0), 0);
-      const top = [...db.products].sort((a, b) => (b.sold || 0) - (a.sold || 0)).slice(0, 5)
-        .map((p) => ({ id: p.id, name: p.name, sold: p.sold || 0, image: p.image, icon: p.icon }));
+      const top = [...db.products]
+        .sort((a, b) => (b.sold || b.sales || 0) - (a.sold || a.sales || 0))
+        .slice(0, 5)
+        .map((p) => ({
+          id: p.id,
+          name: p.name,
+          sales: p.sold || p.sales || 0,
+          price: p.price,
+          image: p.image,
+          icon: p.icon,
+        }));
+      const recent = db.orders.slice(0, 8).map((o) => {
+        const u = db.users.find((x) => x.id === o.user_id);
+        return {
+          ...o,
+          username: o.username || (u && u.username) || '',
+          user_id: o.user_id,
+        };
+      });
       return {
-        revenue, revenue_today: revenueToday,
-        orders_total: db.orders.length,
-        to_ship: toShip, shipped,
-        users: db.users.length,
-        stock, sku: db.products.length,
-        top, recent: db.orders.slice(0, 8),
+        revenue_total: revenueTotal,
+        revenue_today: revenueToday,
+        orders_paid: paid.length,
+        orders_pending: db.orders.filter((o) => o.status === 'pending').length,
+        orders_to_ship: db.orders.filter((o) => o.status === 'paid').length,
+        orders_shipped: db.orders.filter((o) => o.status === 'shipped').length,
+        users_count: db.users.length,
+        products_count: db.products.length,
+        stock_total: db.products.reduce((s, p) => s + (p.stock_left || p.stock_qty || 0), 0),
+        top_products: top,
+        recent_orders: recent,
       };
     }
 
     if (m === 'GET' && path === '/api/admin/products') {
-      return { products: db.products, categories: db.categories };
+      const products = db.products.map((p) => ({
+        ...p,
+        sales: p.sold || p.sales || 0,
+        stock_qty: p.stock_left ?? p.stock_qty ?? 0,
+        stock_left: p.stock_left ?? p.stock_qty ?? 0,
+      }));
+      return { products, categories: db.categories };
     }
 
     if (m === 'POST' && path === '/api/admin/products') {
