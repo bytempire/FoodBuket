@@ -912,3 +912,32 @@ body { user-select: none; -webkit-user-select: none; }
 .field input:focus, .field textarea:focus, .field select:focus {
   border-color: var(--acc);
 }
+
+.addr-toggle {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; margin: 0 0 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--txt);
+  font-family: var(--font-text);
+  font-size: 13.5px; font-weight: 500;
+  text-align: left; cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.addr-toggle-check {
+  width: 22px; height: 22px; border-radius: 7px; flex-shrink: 0;
+  border: 1.5px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #fff;
+  background: transparent;
+}
+.addr-toggle.active {
+  border-color: var(--acc);
+  background: var(--acc-soft);
+}
+.addr-toggle.active .addr-toggle-check {
+  background: var(--acc);
+  border-color: var(--acc);
+}

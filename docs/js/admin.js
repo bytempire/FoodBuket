@@ -370,13 +370,15 @@ const Admin = {
         <div class="t-row total"><span>${esc(t('total'))}</span><span>${money(o.total)}</span></div>
       </div>
       ${o.invoice_id ? `<div class="small muted mb8">${esc(t('a_invoice'))}: <span class="mono">${o.invoice_id}</span></div>` : ''}
-      ${s.name ? `
+      ${(s.phone || s.name || s.no_address) ? `
         <div class="section-title">${esc(t('shipping'))}</div>
         <div class="delivery-box">
-          <div class="ship-line">${esc(s.name)} · ${esc(s.phone || '')}</div>
-          <div class="ship-line">${esc([s.postal, s.city].filter(Boolean).join(', '))}</div>
-          <div class="ship-line">${esc(s.address || '')}</div>
-          ${s.comment ? `<div class="ship-line muted">${esc(s.comment)}</div>` : ''}
+          <div class="ship-line">${esc(s.name || t('guest'))} · ${esc(s.phone || '')}</div>
+          ${s.no_address
+            ? `<div class="ship-line muted">${esc(t('ship_no_address_hint'))}</div>`
+            : `${s.city ? `<div class="ship-line">${esc(s.city)}</div>` : ''}
+               <div class="ship-line">${esc(s.address || '')}</div>
+               ${s.comment ? `<div class="ship-line muted">${esc(s.comment)}</div>` : ''}`}
         </div>` : ''}
       ${o.status === 'shipped' ? `
         <div class="section-title">${esc(t('track'))}</div>

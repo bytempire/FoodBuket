@@ -361,29 +361,63 @@ function openShippingSheet(items, promoCode) {
   } else if (I18N.lang() === 'en' && note === ruShipDefault) {
     note = t('default_shipping_note');
   }
+  let noAddress = !!prev.no_address;
+
+  const renderFields = () => {
+    const addrBlock = qs('#shAddrBlock');
+    if (!addrBlock) return;
+    addrBlock.classList.toggle('hidden', noAddress);
+    qs('#shNoAddr').classList.toggle('active', noAddress);
+    const nameLab = qs('#shNameLab');
+    if (nameLab) nameLab.textContent = noAddress ? t('ship_name_optional') : t('ship_name');
+  };
+
   openSheet(`
     <div class="sheet-title mb16">${esc(t('shipping'))}</div>
     <div class="muted small mb16">${esc(note)}</div>
-    <div class="field"><label>${esc(t('ship_name'))}</label><input id="shName" value="${esc(prev.name || '')}" autocomplete="name"></div>
-    <div class="field"><label>${esc(t('ship_phone'))}</label><input id="shPhone" type="tel" value="${esc(prev.phone || '')}" placeholder="${esc(t('phone_ph'))}" autocomplete="tel"></div>
-    <div class="field-row">
-      <div class="field"><label>${esc(t('ship_city'))}</label><input id="shCity" value="${esc(prev.city || '')}" autocomplete="address-level2"></div>
-      <div class="field"><label>${esc(t('ship_postal'))}</label><input id="shPostal" value="${esc(prev.postal || '')}" autocomplete="postal-code"></div>
+    <button type="button" class="addr-toggle ${noAddress ? 'active' : ''}" id="shNoAddr">
+      <span class="addr-toggle-check">${noAddress ? '✓' : ''}</span>
+      <span>${esc(t('ship_no_address'))}</span>
+    </button>
+    <div class="muted small mb16" id="shNoAddrHint" style="${noAddress ? '' : 'display:none'}">${esc(t('ship_no_address_hint'))}</div>
+    <div class="field"><label id="shNameLab">${esc(noAddress ? t('ship_name_optional') : t('ship_name'))}</label>
+      <input id="shName" value="${esc(prev.name || '')}" autocomplete="name"></div>
+    <div class="field"><label>${esc(t('ship_phone'))}</label>
+      <input id="shPhone" type="tel" value="${esc(prev.phone || '')}" placeholder="${esc(t('phone_ph'))}" autocomplete="tel"></div>
+    <div id="shAddrBlock" class="${noAddress ? 'hidden' : ''}">
+      <div class="field"><label>${esc(t('ship_city'))}</label>
+        <input id="shCity" value="${esc(prev.city || '')}" autocomplete="address-level2"></div>
+      <div class="field"><label>${esc(t('ship_address'))}</label>
+        <input id="shAddr" value="${esc(prev.address || '')}" autocomplete="street-address"></div>
+      <div class="field"><label>${esc(t('ship_comment'))}</label>
+        <input id="shComment" value="${esc(prev.comment || '')}" placeholder="${esc(t('ship_comment_ph'))}"></div>
     </div>
-    <div class="field"><label>${esc(t('ship_address'))}</label><input id="shAddr" value="${esc(prev.address || '')}" autocomplete="street-address"></div>
-    <div class="field"><label>${esc(t('ship_comment'))}</label><input id="shComment" value="${esc(prev.comment || '')}" placeholder="${esc(t('ship_comment_ph'))}"></div>
     <button class="btn" id="shNext">${icDark('wallet', 17)} ${esc(t('to_payment'))}</button>
   `);
+
+  qs('#shNoAddr').onclick = () => {
+    noAddress = !noAddress;
+    haptic('light');
+    renderFields();
+    const hint = qs('#shNoAddrHint');
+    if (hint) hint.style.display = noAddress ? '' : 'none';
+  };
+
   qs('#shNext').onclick = () => {
     const shipping = {
       name: qs('#shName').value.trim(),
       phone: qs('#shPhone').value.trim(),
-      city: qs('#shCity').value.trim(),
-      postal: qs('#shPostal').value.trim(),
-      address: qs('#shAddr').value.trim(),
-      comment: qs('#shComment').value.trim(),
+      no_address: noAddress,
+      city: noAddress ? '' : ((qs('#shCity') && qs('#shCity').value.trim()) || ''),
+      postal: '',
+      address: noAddress ? '' : ((qs('#shAddr') && qs('#shAddr').value.trim()) || ''),
+      comment: noAddress ? '' : ((qs('#shComment') && qs('#shComment').value.trim()) || ''),
     };
-    if (!shipping.name || !shipping.phone || !shipping.city || !shipping.address) {
+    if (!shipping.phone) {
+      toast(t('fill_phone'), true);
+      return;
+    }
+    if (!noAddress && (!shipping.city || !shipping.address)) {
       toast(t('fill_required'), true);
       return;
     }
@@ -477,12 +511,20 @@ function startPolling(orderId) {
 function shippingBlock(order) {
   const s = order.shipping;
   if (!s) return '';
+  if (s.no_address) {
+    return `
+      <div class="delivery-box">
+        <div class="dl-name">${ic('map-pin', 13, '#7A8B82')} ${esc(t('ship_address_title'))}</div>
+        <div class="ship-line">${esc(s.name || t('guest'))} · ${esc(s.phone)}</div>
+        <div class="ship-line muted">${esc(t('ship_no_address_hint'))}</div>
+      </div>`;
+  }
   return `
     <div class="delivery-box">
       <div class="dl-name">${ic('map-pin', 13, '#7A8B82')} ${esc(t('ship_address_title'))}</div>
-      <div class="ship-line">${esc(s.name)} · ${esc(s.phone)}</div>
-      <div class="ship-line">${esc(s.postal ? s.postal + ', ' : '')}${esc(s.city)}</div>
-      <div class="ship-line">${esc(s.address)}</div>
+      <div class="ship-line">${esc(s.name || t('guest'))} · ${esc(s.phone)}</div>
+      ${s.city ? `<div class="ship-line">${esc(s.city)}</div>` : ''}
+      <div class="ship-line">${esc(s.address || '')}</div>
       ${s.comment ? `<div class="ship-line muted">${esc(s.comment)}</div>` : ''}
     </div>`;
 }
